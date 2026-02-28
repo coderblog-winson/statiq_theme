@@ -1,0 +1,39 @@
+@* /*
+ * Author  : Winson
+ * Website : https://www.coderblog.in
+ * Medium  : https://medium.com/@winsonet
+ * * Copyright (c) 2026 Winson. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */ *@
+
+
+@{
+    Layout = "_Layout.cshtml";
+    // Get the current tags name
+    var tagName = Document.GetString(Keys.GroupKey);
+}
+
+<section>
+    <header class="main">
+        <h1>Tag: <em>@tagName</em></h1>
+    </header>
+
+    <div class="posts">
+        @foreach (var post in Document.GetChildren())
+        {
+            <article>
+                @if (post.ContainsKey("Image"))
+                {
+                    <a href="@post.GetLink()" class="image">
+                        <img src="@post.GetString("Image")" alt="" />
+                    </a>
+                }
+                <h3><a href="@post.GetLink()">@post.GetString("Title")</a></h3>
+                <p>@post.GetString("Description")</p>
+                <ul class="actions">
+                    <li><a href="@post.GetLink()" class="button">Read More</a></li>
+                </ul>
+            </article>
+        }
+    </div>
+</section>

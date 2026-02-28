@@ -1,0 +1,105 @@
+@* /*
+ * Author  : Winson
+ * Website : https://www.coderblog.in
+ * Medium  : https://medium.com/@winsonet
+ * * Copyright (c) 2026 Winson. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */ *@
+
+
+@using Statiq.Common
+@using System.Linq
+
+@{
+    Layout = "/_Layout.cshtml";
+    IgnoreBody();
+}
+
+<section>
+    <header class="main">
+        <h1>@Document.GetTitle()</h1>
+    </header>
+
+    @if (Document.ContainsKey("Description"))
+    {
+        <p>@Document.GetString("Description")</p>
+    }
+
+    <div class="posts">
+        @{
+            // 1. Define the variable IEnumerable<IDocument>
+            IEnumerable<IDocument> posts;
+
+            // 2. Get the children docs
+            var childDocs = Document.GetChildren();
+
+
+            if (childDocs.Any())
+            {
+                posts = childDocs;
+            }
+            else
+            {
+                posts = OutputPages.GetChildrenOf(Document)
+                    .Where(x => x.Source.Extension == ".md" && x.Id != Document.Id)
+                    .OrderByDescending(x => x.Get<DateTime>("Date", DateTime.MinValue));
+            }
+        }
+
+        @foreach (var post in posts)
+        {
+            <article>
+                @if (post.ContainsKey("Image"))
+                {
+                    <a href="@post.GetLink()" class="image">
+                        <img src="@post.GetString("Image")" alt="" />
+                    </a>
+                }
+                <h3><a href="@post.GetLink()">@post.GetString("Title")</a></h3>
+                <p>@post.GetString("Description")</p>
+                <ul class="actions">
+                    <li><a href="@post.GetLink()" class="button">Read More</a></li>
+                </ul>
+            </article>
+        }
+    </div>
+
+    @{
+        // Get the previouse and next page documents
+        var prevPage = Document.GetDocument(Keys.Previous);
+        var nextPage = Document.GetDocument(Keys.Next);
+
+        // Get the total pages and current page number
+        var totalPages = Document.GetInt(Keys.TotalPages);
+        var currentPage = Document.GetInt(Keys.Index);
+    }
+
+    @if (totalPages > 1)
+    {
+        <div class="pagination" style="margin-top: 3rem; text-align: center;">
+
+            @if (prevPage != null)
+            {
+                <a href="@prevPage.GetLink()" class="button">Prev</a>
+            }
+            else
+            {
+                <span class="button disabled">Prev</span>
+            }
+
+            <span class="extra" style="margin: 0 1rem;">
+                Page @currentPage of @totalPages
+            </span>
+
+            @if (nextPage != null)
+            {
+                <a href="@nextPage.GetLink()" class="button">Next</a>
+            }
+            else
+            {
+                <span class="button disabled">Next</span>
+            }
+        </div>
+    }
+
+</section>

@@ -1,0 +1,79 @@
+---
+Permalink: /search-index.json
+---
+@using System.Text.Json
+@using System.Text.RegularExpressions
+@using Statiq.Common
+@using System.Net 
+
+@{
+    Layout = null;
+
+    // Define the clean function
+    Func<string, string> CleanText = (input) =>
+    {
+        if (string.IsNullOrEmpty(input)) return string.Empty;
+
+        // 1. Remove the HTML tags (like <p>, <div>, etc.)
+        var text = Regex.Replace(input, "<.*?>", " ");
+
+        // 2. Decode &quot; &nbsp; HTML tags
+        text = WebUtility.HtmlDecode(text);
+
+        // 3. Remove newlines, tabs, and collapse multiple spaces into one
+        text = Regex.Replace(text, @"\s+", " ").Trim();
+
+        return text;
+    };
+
+    var searchEntries = new List<object>();
+
+    foreach (var doc in OutputPages)
+    {
+
+        // 1. Only index HTML files (by extension)
+        if (doc.Destination.Extension != ".html") continue;
+
+        // 2. Must have a title
+        if (!doc.ContainsKey("Title") || string.IsNullOrEmpty(doc.GetString("Title"))) continue;
+
+        // 3. Get the file name
+        var fileName = doc.Destination.FileName.ToString();
+
+        // 4. Exclude the search page, index page, and the search index itself
+        if (fileName.Equals("search.html", StringComparison.OrdinalIgnoreCase)) continue;
+        if (fileName.Equals("index.html", StringComparison.OrdinalIgnoreCase)) continue;
+        if (fileName.Contains("search-index")) continue; // 防止索引自己
+
+        // --- Handle content ---
+
+        // Synchronously get the content (since we are in a synchronous context)
+        string rawContent = doc.GetContentStringAsync().GetAwaiter().GetResult();
+
+        // Clean the content
+        string cleanContent = CleanText(rawContent);
+
+        // Get the 5000 first characters of the content (or less if the content is shorter)
+        if (cleanContent.Length > 5000)
+        {
+            cleanContent = cleanContent.Substring(0, 5000);
+        }
+
+        searchEntries.Add(new
+        {
+            title = doc.GetString("Title"),
+            link = doc.GetLink(),
+            description = doc.GetString("Description") ?? "",
+            content = cleanContent
+        });
+    }
+
+    var options = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = false
+    };
+
+    string json = JsonSerializer.Serialize(searchEntries, options);
+}
+@Html.Raw(json)

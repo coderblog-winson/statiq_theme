@@ -1,0 +1,232 @@
+@* /*
+ * Author  : Winson
+ * Website : https://www.coderblog.in
+ * Medium  : https://medium.com/@winsonet
+ * * Copyright (c) 2026 Winson. All rights reserved.
+ * Licensed under the MIT License. See LICENSE file in the project root for full license information.
+ */ *@
+
+
+@{
+    Layout = "_Layout.cshtml";
+}
+
+@using System.Linq
+@using Statiq.Common
+
+<!-- Content -->
+<section>
+    <header class="main">
+        <h1>@Document.GetTitle()</h1>
+        @if (Document.ContainsKey("Date"))
+        {
+            <p style="color: #999; margin-top: -15px; font-size: 0.9em; font-style: italic;">
+                <span class="icon solid fa-calendar" style="margin-right: 5px;"></span>
+                @(Document.Get<DateTime>("Date").ToLongDateString())
+            </p>
+        }
+    </header>
+
+    @if (Document.ContainsKey("Image"))
+    {
+        <figure style="width: 90%; margin: 2rem auto; text-align: center;">
+
+            <img src="@Document.GetString("Image")"
+                 alt="A potter's studio showing the raw process of creating durable stoneware."
+                 style="width: 100%; height: auto; border-radius: 5px;" />
+        </figure>
+    }
+
+    @if (Document.ContainsKey("Description"))
+    {
+        <p class="intro" style="font-size: 1.2em; font-style: italic; color: #555;">
+            @Document.GetString("Description")
+        </p>
+    }
+
+    <div class="post-content">
+        @RenderBody()
+    </div>
+
+    <div class="view-badge">
+        <i class="fa fa-chart-line"></i>
+        <span class="count"><span class="waline-pageview-count">...</span></span> Reads
+    </div>
+
+    <hr class="major" />
+
+    @if (Document.ContainsKey("AffiliateLink"))
+    {
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="@Document.GetString("AffiliateLink")" class="button primary big">Check Price on Amazon</a>
+        </div>
+    }
+
+    @if (Document.ContainsKey("Tags"))
+    {
+        <div class="tags-container" style="margin: 1rem 0;">
+            <span style="font-weight:bold; margin-right: 10px;">Tags:</span>
+
+            @foreach (var tag in Document.GetList<string>("Tags"))
+            {
+
+                var tagSlug = tag.ToLower().Replace(" ", "-");
+
+
+                <a href="/tag/@(tagSlug)" class="button small" style="margin-right: 5px; margin-bottom: 5px;">
+                    #@tag
+                </a>
+            }
+        </div>
+    }
+</section>
+
+<div id="waline"></div>
+
+<button id="back-to-top" aria-label="Back to Top">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="19" x2="12" y2="5"></line>
+        <polyline points="5 12 12 5 19 12"></polyline>
+    </svg>
+</button>
+
+<style>
+    #back-to-top {
+
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+        display: none;
+
+        background-color: #f56a6a;
+
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        outline: none;
+    }
+
+    #back-to-top:hover {
+        background-color: #f34848;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    #back-to-top svg {
+        width: 24px !important;
+        height: 24px !important;
+        stroke: white !important;
+        display: block;
+        margin: auto;
+        flex-shrink: 0;
+    }
+
+
+    .view-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: #f4f4f4;
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-size: 0.85em;
+        color: #666;
+        margin: 2em 0;
+        border: 1px solid #e5e5e5;
+        transition: all 0.2s ease;
+    }
+
+    .view-badge:hover {
+        background-color: #fff;
+        border-color: #f56a6a;
+    }
+
+    .view-badge i {
+        color: #999;
+        margin-right: 8px;
+    }
+
+    .view-badge .count {
+        font-weight: bold;
+        color: #f56a6a;
+        /* 數字用主題紅 */
+        margin-right: 4px;
+    }
+</style>
+
+<script>
+    (function () {
+
+        // create the back to top button
+        const btn = document.getElementById("back-to-top");
+
+        if (!btn) return;
+
+        window.addEventListener("scroll", function () {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                btn.style.display = "flex";
+            } else {
+                btn.style.display = "none";
+            }
+        });
+
+        btn.addEventListener("click", function () {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+    })();
+</script>
+
+
+@{
+    var adsId = Context.Settings.GetString("GoogleAdSenseId");
+}
+@if (!string.IsNullOrEmpty(adsId))
+{
+    @* 1. 改用 <template>，這不會干擾 Google AdSense 的自動掃描 *@
+    <template id="ad-template">
+        <div style="text-align:center;margin:10px 0;">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="@adsId" data-ad-slot="7452719537"
+                 data-ad-format="auto" data-full-width-responsive="true"></ins>
+        </div>
+    </template>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var contentContainer = document.querySelector('.post-content');
+            if (!contentContainer) return;
+
+            //only show the AD after 3 paragraphs
+            var paragraphs = contentContainer.querySelectorAll('p');
+            if (paragraphs.length >= 3) {
+                var adDiv = document.createElement('div');
+                adDiv.style.margin = "30px 0";
+                adDiv.style.width = "100%";
+                adDiv.style.display = "block";
+
+                var template = document.getElementById('ad-template');
+                var adContent = template.content.cloneNode(true);
+                adDiv.appendChild(adContent);
+
+                paragraphs[2].parentNode.insertBefore(adDiv, paragraphs[2].nextSibling);
+
+                requestAnimationFrame(function () {
+                    setTimeout(function () {
+                        (window.adsbygoogle = window.adsbygoogle || []).push({});
+                    }, 100);
+                });
+            }
+        });
+    </script>
+}

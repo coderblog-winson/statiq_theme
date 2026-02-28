@@ -1,0 +1,80 @@
+Title: Archives
+Layout: _Layout.cshtml
+---
+@using System.Linq
+@using Statiq.Common
+
+<section>
+    <header class="main">
+        <h1>Archives</h1>
+    </header>
+
+    @{
+        var allPosts = OutputPages
+        .Where(x => x.Source != null
+        && x.Source.ToString().Contains("posts")
+        && x.Source.Extension == ".md"
+                         && x.ContainsKey("Date"));
+
+        var postsByYear = allPosts
+        .OrderByDescending(x => x.Get<DateTime>("Date"))
+        .GroupBy(x => x.Get<DateTime>("Date").Year);
+    }
+
+    @if (!postsByYear.Any())
+    {
+        <p>No archives found.</p>
+    }
+    else
+    {
+        foreach (var yearGroup in postsByYear)
+        {
+            <h2 id="year-@yearGroup.Key" style="border-bottom: 2px solid #f56a6a; padding-bottom: 10px; margin-top: 2em;">
+                @yearGroup.Key
+            </h2>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 120px;">Date</th>
+                            <th>Title</th>
+                            <th>Category / Tags</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var post in yearGroup)
+                        {
+                            var postDate = post.Get<DateTime>("Date");
+
+                            <tr>
+                                <td style="white-space: nowrap; width: 120px;">
+                                    @postDate.ToString("MMM dd")
+                                </td>
+
+                                <td>
+                                    <a href="@post.GetLink()" style="font-weight: bold;">
+                                        @post.GetString("Title")
+                                    </a>
+                                </td>
+
+                                <td>
+                                    @if (post.ContainsKey("Tags"))
+                                    {
+                                        foreach (var tag in post.GetList<string>("Tags").Take(3))
+                                        {
+                                            <span class="button small"
+                                                  style="font-size: 0.6em; height: 2em; line-height: 2em; padding: 0 10px; margin-right: 2px;">
+                                                @tag
+                                            </span>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+</section>
