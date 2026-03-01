@@ -43,7 +43,7 @@ Permalink: /search-index.json
         // 4. Exclude the search page, index page, and the search index itself
         if (fileName.Equals("search.html", StringComparison.OrdinalIgnoreCase)) continue;
         if (fileName.Equals("index.html", StringComparison.OrdinalIgnoreCase)) continue;
-        if (fileName.Contains("search-index")) continue; // 防止索引自己
+        if (fileName.Contains("search-index")) continue; // avoid index itself
 
         // --- Handle content ---
 
