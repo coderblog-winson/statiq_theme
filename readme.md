@@ -4,7 +4,7 @@ A modern, high-performance static site generator theme built primarily for **.NE
 
 This project demonstrates how to leverage [Statiq](https://statiq.dev/), a powerful static generation framework based on .NET Core, to build a fully functional blog with advanced features like client-side search and dynamic taxonomy.
 
-It serves as the companion source code for the Medium article: **[Building a Static Site with Statiq & Lunr.js](https://medium.com/@winsonet/finally-a-static-site-generator-that-speaks-c-getting-started-with-statiq-e07c3ba3c5fd)**.
+It serves as the companion source code for the Medium article: **[Finally, a Static Site Generator That Speaks C#: Getting Started with Statiq](https://medium.com/@winsonet/finally-a-static-site-generator-that-speaks-c-getting-started-with-statiq-e07c3ba3c5fd)**.
 
 ---
 
